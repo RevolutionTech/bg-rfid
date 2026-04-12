@@ -10,7 +10,7 @@ export const queryClient = new QueryClient({
         if (axios.isAxiosError(error) && error.response?.status === 202) {
           return true;
         }
-        // Default retry behaviour for other errors
+        // Default retry behavior for other errors
         return failureCount < 3;
       },
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),

@@ -11,15 +11,22 @@ export function GameCard({ game }: GameCardProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(game.id);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    try {
+      await navigator.clipboard.writeText(game.id);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Clipboard access denied or unavailable
+    }
   };
 
   return (
     <div className="flex flex-col items-center rounded-lg border border-border bg-card p-4 shadow-sm">
       <img
-        src={game.thumbnail ?? "https://via.placeholder.com/150?text=No+Image"}
+        src={
+          game.thumbnail ??
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect width='150' height='150' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E"
+        }
         alt={game.name}
         className="mb-3 h-36 w-36 rounded object-contain"
       />
