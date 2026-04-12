@@ -8,7 +8,7 @@ export async function searchGames(
 ): Promise<BggGame[]> {
   const response = await axios.get("/api/bgg/search", {
     params: { query, type: "boardgame" },
-    headers: { "bgg-app-token": token },
+    headers: { Authorization: `Bearer ${token}` },
     responseType: "text",
   });
 
