@@ -7,7 +7,7 @@ interface GameListProps {
 
 export function GameList({ games }: GameListProps) {
   return (
-    <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div className="flex w-full flex-col divide-y divide-border rounded-lg border border-border">
       {games.map((game) => (
         <GameCard key={game.id} game={game} />
       ))}
