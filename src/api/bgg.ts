@@ -2,9 +2,13 @@ import axios from "axios";
 import { parseSearchResults } from "@/lib/parseXml";
 import type { BggGame } from "@/types/bgg";
 
-export async function searchGames(query: string): Promise<BggGame[]> {
+export async function searchGames(
+  query: string,
+  token: string,
+): Promise<BggGame[]> {
   const response = await axios.get("/api/bgg/search", {
     params: { query, type: "boardgame" },
+    headers: { "bgg-app-token": token },
     responseType: "text",
   });
 
