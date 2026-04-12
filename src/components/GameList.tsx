@@ -1,4 +1,4 @@
-import { GameCard } from "@/components/GameCard";
+import { GameRow } from "@/components/GameCard";
 import type { BggGame } from "@/types/bgg";
 
 interface GameListProps {
@@ -7,10 +7,19 @@ interface GameListProps {
 
 export function GameList({ games }: GameListProps) {
   return (
-    <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-      {games.map((game) => (
-        <GameCard key={game.id} game={game} />
-      ))}
-    </div>
+    <table className="w-full border-collapse overflow-hidden rounded-lg border border-border text-left">
+      <thead>
+        <tr className="border-b border-border bg-muted text-xs font-medium text-muted-foreground">
+          <th className="px-4 py-2"><span className="sr-only">Thumbnail</span></th>
+          <th className="px-4 py-2">Name</th>
+          <th className="px-4 py-2">BGG ID</th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-border">
+        {games.map((game) => (
+          <GameRow key={game.id} game={game} />
+        ))}
+      </tbody>
+    </table>
   );
 }
