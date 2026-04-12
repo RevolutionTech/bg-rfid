@@ -42,12 +42,16 @@ export function SettingsDialog({ token, onTokenChange }: SettingsDialogProps) {
       {open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          role="presentation"
           onClick={() => setOpen(false)}
-          onKeyDown={handleKeyDown}
         >
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="settings-dialog-title"
             className="relative w-full max-w-md rounded-lg border border-border bg-card p-6 shadow-lg"
             onClick={(e) => e.stopPropagation()}
+            onKeyDown={handleKeyDown}
           >
             <button
               onClick={() => setOpen(false)}
@@ -57,7 +61,10 @@ export function SettingsDialog({ token, onTokenChange }: SettingsDialogProps) {
               <X className="size-4" />
             </button>
 
-            <h2 className="mb-4 text-lg font-semibold text-card-foreground">
+            <h2
+              id="settings-dialog-title"
+              className="mb-4 text-lg font-semibold text-card-foreground"
+            >
               Settings
             </h2>
 
