@@ -3,9 +3,11 @@ import type { BggGame } from "@/types/bgg";
 
 interface GameListProps {
   games: BggGame[];
+  thumbnails: Record<string, string>;
+  thumbnailsLoading: boolean;
 }
 
-export function GameList({ games }: GameListProps) {
+export function GameList({ games, thumbnails, thumbnailsLoading }: GameListProps) {
   return (
     <table className="w-full border-collapse overflow-hidden rounded-lg border border-border text-left">
       <thead>
@@ -17,7 +19,12 @@ export function GameList({ games }: GameListProps) {
       </thead>
       <tbody className="divide-y divide-border">
         {games.map((game) => (
-          <GameRow key={game.id} game={game} />
+          <GameRow
+            key={game.id}
+            game={game}
+            thumbnail={thumbnails[game.id]}
+            thumbnailLoading={thumbnailsLoading}
+          />
         ))}
       </tbody>
     </table>

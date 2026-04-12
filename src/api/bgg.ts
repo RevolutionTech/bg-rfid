@@ -1,5 +1,5 @@
 import axios from "axios";
-import { parseSearchResults } from "@/lib/parseXml";
+import { parseSearchResults, parseThingResults } from "@/lib/parseXml";
 import type { BggGame } from "@/types/bgg";
 
 export async function searchGames(
@@ -23,4 +23,19 @@ export async function searchGames(
   }
 
   return parseSearchResults(response.data);
+}
+
+export async function fetchThumbnails(
+  ids: string[],
+  token: string,
+): Promise<Record<string, string>> {
+  if (ids.length === 0) return {};
+
+  const response = await axios.get("/api/bgg/thing", {
+    params: { id: ids.join(","), type: "boardgame" },
+    headers: { Authorization: `Bearer ${token}` },
+    responseType: "text",
+  });
+
+  return parseThingResults(response.data);
 }
