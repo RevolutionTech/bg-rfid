@@ -25,4 +25,4 @@ dist-ssr
 
 # Terraform
 .terraform/
-terraform.tfstate
+terraform.tfstate*
