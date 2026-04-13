@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useAppToken } from "@/hooks/useAppToken";
@@ -15,8 +16,10 @@ import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 const PAGE_SIZE = 20;
 
 function AppContent() {
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get("q") ?? "";
+  const page = Math.max(0, (Number(searchParams.get("page")) || 1) - 1);
+
   const { token, setToken } = useAppToken();
   const { data, isLoading, isError, isFetching } = useBggSearch(query, token);
 
@@ -34,8 +37,19 @@ function AppContent() {
   );
 
   const handleSearch = (q: string) => {
-    setQuery(q);
-    setPage(0);
+    setSearchParams(q ? { q } : {});
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (newPage <= 1) {
+        next.delete("page");
+      } else {
+        next.set("page", String(newPage));
+      }
+      return next;
+    });
   };
 
   return (
@@ -49,7 +63,7 @@ function AppContent() {
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center gap-6 px-4 py-6">
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar initialQuery={query} onSearch={handleSearch} />
         {!token && (
           <p className="text-sm text-muted-foreground">
             Set your BGG app token in Settings (gear icon) to enable search.
@@ -76,7 +90,7 @@ function AppContent() {
                   variant="outline"
                   size="sm"
                   disabled={page === 0}
-                  onClick={() => setPage((p) => p - 1)}
+                  onClick={() => handlePageChange(page)}
                 >
                   <ChevronLeft className="size-4" />
                   Previous
@@ -88,7 +102,7 @@ function AppContent() {
                   variant="outline"
                   size="sm"
                   disabled={page >= totalPages - 1}
-                  onClick={() => setPage((p) => p + 1)}
+                  onClick={() => handlePageChange(page + 2)}
                 >
                   Next
                   <ChevronRight className="size-4" />

@@ -3,11 +3,12 @@ import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface SearchBarProps {
+  initialQuery?: string;
   onSearch: (query: string) => void;
 }
 
-export function SearchBar({ onSearch }: SearchBarProps) {
-  const [input, setInput] = useState("");
+export function SearchBar({ initialQuery = "", onSearch }: SearchBarProps) {
+  const [input, setInput] = useState(initialQuery);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
