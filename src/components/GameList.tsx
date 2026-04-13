@@ -14,7 +14,7 @@ export function GameList({ games, thumbnails, thumbnailsLoading }: GameListProps
         <tr className="border-b border-border bg-muted text-xs font-medium text-muted-foreground">
           <th className="px-4 py-2"><span className="sr-only">Thumbnail</span></th>
           <th className="px-4 py-2">Name</th>
-          <th className="px-4 py-2">BGG ID</th>
+          <th className="px-4 py-2">RFID Tag</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-border">

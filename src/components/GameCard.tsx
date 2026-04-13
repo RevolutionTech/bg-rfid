@@ -14,10 +14,11 @@ interface GameRowProps {
 
 export function GameRow({ game, thumbnail, thumbnailLoading }: GameRowProps) {
   const [copied, setCopied] = useState(false);
+  const rfidTag = `bgstats://app.bgstatsapp.com/addPlay.html?gameId=${game.id}`;
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(game.id);
+      await navigator.clipboard.writeText(rfidTag);
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
@@ -43,7 +44,7 @@ export function GameRow({ game, thumbnail, thumbnailLoading }: GameRowProps) {
       </td>
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">{game.id}</span>
+          <span className="text-sm text-muted-foreground">{rfidTag}</span>
           <Button
             variant="outline"
             size="sm"
@@ -58,7 +59,7 @@ export function GameRow({ game, thumbnail, thumbnailLoading }: GameRowProps) {
             ) : (
               <>
                 <Copy data-icon="inline-start" className="size-3" />
-                Copy ID
+                Copy Tag
               </>
             )}
           </Button>
