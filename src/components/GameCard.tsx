@@ -3,11 +3,16 @@ import { Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { BggGame } from "@/types/bgg";
 
+const NO_IMAGE_PLACEHOLDER =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect width='150' height='150' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E";
+
 interface GameRowProps {
   game: BggGame;
+  thumbnail?: string;
+  thumbnailLoading?: boolean;
 }
 
-export function GameRow({ game }: GameRowProps) {
+export function GameRow({ game, thumbnail, thumbnailLoading }: GameRowProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -23,14 +28,15 @@ export function GameRow({ game }: GameRowProps) {
   return (
     <tr className="bg-card">
       <td className="px-4 py-3">
-        <img
-          src={
-            game.thumbnail ??
-            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect width='150' height='150' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E"
-          }
-          alt={game.name}
-          className="h-10 w-10 rounded object-contain"
-        />
+        {thumbnailLoading ? (
+          <div className="h-10 w-10 animate-pulse rounded bg-muted" />
+        ) : (
+          <img
+            src={thumbnail ?? NO_IMAGE_PLACEHOLDER}
+            alt={game.name}
+            className="h-10 w-10 rounded object-contain"
+          />
+        )}
       </td>
       <td className="px-4 py-3 text-sm font-semibold text-foreground">
         {game.name}
