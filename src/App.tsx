@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useAppToken } from "@/hooks/useAppToken";
@@ -15,17 +16,21 @@ import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 const PAGE_SIZE = 20;
 
 function AppContent() {
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get("q") ?? "";
+  // pageIndex is 0-based for array slicing; currentPage is 1-based for the URL
+  const currentPage = Math.max(1, Number(searchParams.get("page")) || 1);
+  const pageIndex = currentPage - 1;
+
   const { token, setToken } = useAppToken();
   const { data, isLoading, isError, isFetching } = useBggSearch(query, token);
 
   const totalPages = data ? Math.ceil(data.length / PAGE_SIZE) : 0;
   const pageGames = useMemo(() => {
     if (!data) return [];
-    const start = page * PAGE_SIZE;
+    const start = pageIndex * PAGE_SIZE;
     return data.slice(start, start + PAGE_SIZE);
-  }, [data, page]);
+  }, [data, pageIndex]);
 
   const pageIds = useMemo(() => pageGames.map((g) => g.id), [pageGames]);
   const { thumbnails, isLoading: thumbnailsLoading } = useBggThumbnails(
@@ -34,8 +39,19 @@ function AppContent() {
   );
 
   const handleSearch = (q: string) => {
-    setQuery(q);
-    setPage(0);
+    setSearchParams(q ? { q } : {});
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (newPage <= 1) {
+        next.delete("page");
+      } else {
+        next.set("page", String(newPage));
+      }
+      return next;
+    });
   };
 
   return (
@@ -49,7 +65,7 @@ function AppContent() {
         </div>
       </header>
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center gap-6 px-4 py-6">
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar initialQuery={query} onSearch={handleSearch} />
         {!token && (
           <p className="text-sm text-muted-foreground">
             Set your BGG app token in Settings (gear icon) to enable search.
@@ -75,20 +91,20 @@ function AppContent() {
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={page === 0}
-                  onClick={() => setPage((p) => p - 1)}
+                  disabled={currentPage <= 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
                 >
                   <ChevronLeft className="size-4" />
                   Previous
                 </Button>
                 <span className="text-sm text-muted-foreground">
-                  Page {page + 1} of {totalPages}
+                  Page {currentPage} of {totalPages}
                 </span>
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={page >= totalPages - 1}
-                  onClick={() => setPage((p) => p + 1)}
+                  disabled={currentPage >= totalPages}
+                  onClick={() => handlePageChange(currentPage + 1)}
                 >
                   Next
                   <ChevronRight className="size-4" />
