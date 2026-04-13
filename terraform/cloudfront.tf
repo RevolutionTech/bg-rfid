@@ -6,7 +6,7 @@ locals {
   s3_origin_id     = "s3-${var.domain_name}"
   lambda_origin_id = "lambda-${var.domain_name}"
   # Extract the domain from the Lambda Function URL (strip the https:// prefix and trailing /)
-  lambda_origin_domain = replace(replace(aws_lambda_function_url.this.function_url, "https://", ""), "/", "")
+  lambda_origin_domain = trimsuffix(trimprefix(aws_lambda_function_url.this.function_url, "https://"), "/")
 }
 
 # Origin request policy that forwards all headers EXCEPT Host to the Lambda origin.
