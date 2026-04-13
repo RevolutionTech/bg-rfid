@@ -9,15 +9,23 @@ app.all("/api/bgg/*", async (c) => {
   const path = c.req.path.replace(/^\/api\/bgg/, "");
   const queryString = new URL(c.req.url).search;
   const upstream = `https://boardgamegeek.com/xmlapi2${path}${queryString}`;
+  const forwardedHeaders = new Headers(c.req.raw.headers);
+  forwardedHeaders.delete("host");
+  forwardedHeaders.delete("x-forwarded-for");
+  forwardedHeaders.delete("x-forwarded-proto");
+  forwardedHeaders.delete("x-amzn-trace-id");
 
   try {
-    const response = await fetch(upstream);
+    const response = await fetch(upstream, { headers: forwardedHeaders });
     const body = await response.text();
     return c.text(body, response.status as ContentfulStatusCode, {
       "Content-Type": "text/xml",
     });
   } catch (e) {
-    console.error("Upstream fetch failed:", e instanceof Error ? e.message : "unknown error");
+    console.error(
+      "Upstream fetch failed:",
+      e instanceof Error ? e.message : "unknown error",
+    );
     return c.text("Bad Gateway", 502);
   }
 });

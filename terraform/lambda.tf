@@ -41,6 +41,21 @@ resource "aws_lambda_function" "proxy" {
   tags = var.tags
 }
 
+resource "aws_lambda_permission" "function_invoke_public" {
+  statement_id  = "AllowPublicInvokeAccess"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.proxy.function_name
+  principal     = "*"
+}
+
+resource "aws_lambda_permission" "function_url_public" {
+  statement_id           = "FunctionURLAllowPublicAccess"
+  action                 = "lambda:InvokeFunctionUrl"
+  function_name          = aws_lambda_function.proxy.function_name
+  principal              = "*"
+  function_url_auth_type = "NONE"
+}
+
 # Lambda Function URL — no CORS (requests come through CloudFront on the same domain)
 resource "aws_lambda_function_url" "proxy" {
   function_name      = aws_lambda_function.proxy.function_name
