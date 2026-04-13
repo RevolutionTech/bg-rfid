@@ -1,4 +1,4 @@
-resource "aws_cloudfront_origin_access_identity" "this" {
+resource "aws_cloudfront_origin_access_identity" "oai" {
   comment = "OAI for ${var.domain_name}"
 }
 
@@ -6,7 +6,7 @@ locals {
   s3_origin_id     = "s3-${var.domain_name}"
   lambda_origin_id = "lambda-${var.domain_name}"
   # Extract the domain from the Lambda Function URL (strip the https:// prefix and trailing /)
-  lambda_origin_domain = trimsuffix(trimprefix(aws_lambda_function_url.this.function_url, "https://"), "/")
+  lambda_origin_domain = trimsuffix(trimprefix(aws_lambda_function_url.proxy.function_url, "https://"), "/")
 }
 
 # Origin request policy that forwards all headers EXCEPT Host to the Lambda origin.
@@ -31,7 +31,7 @@ resource "aws_cloudfront_origin_request_policy" "lambda" {
   }
 }
 
-resource "aws_cloudfront_distribution" "this" {
+resource "aws_cloudfront_distribution" "cdn" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
@@ -39,11 +39,11 @@ resource "aws_cloudfront_distribution" "this" {
 
   # S3 origin — frontend assets via OAI
   origin {
-    domain_name = aws_s3_bucket.this.bucket_regional_domain_name
+    domain_name = aws_s3_bucket.frontend.bucket_regional_domain_name
     origin_id   = local.s3_origin_id
 
     s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.this.cloudfront_access_identity_path
+      origin_access_identity = aws_cloudfront_origin_access_identity.oai.cloudfront_access_identity_path
     }
   }
 
@@ -91,7 +91,7 @@ resource "aws_cloudfront_distribution" "this" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate_validation.this.certificate_arn
+    acm_certificate_arn      = var.acm_certificate_arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2018"
   }

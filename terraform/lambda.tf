@@ -30,7 +30,7 @@ data "archive_file" "lambda" {
 }
 
 # Lambda function
-resource "aws_lambda_function" "this" {
+resource "aws_lambda_function" "proxy" {
   function_name    = replace(var.domain_name, ".", "-")
   role             = aws_iam_role.lambda.arn
   handler          = "index.handler"
@@ -42,7 +42,7 @@ resource "aws_lambda_function" "this" {
 }
 
 # Lambda Function URL — no CORS (requests come through CloudFront on the same domain)
-resource "aws_lambda_function_url" "this" {
-  function_name      = aws_lambda_function.this.function_name
+resource "aws_lambda_function_url" "proxy" {
+  function_name      = aws_lambda_function.proxy.function_name
   authorization_type = "NONE"
 }
