@@ -34,7 +34,7 @@ export function SettingsDialog({ token, onTokenChange }: SettingsDialogProps) {
         size="icon"
         onClick={handleOpen}
         aria-label="Settings"
-        className="fixed right-4 top-4"
+        className="fixed right-4 top-4 text-primary-foreground hover:bg-primary-foreground/20"
       >
         <Settings className="size-5" />
       </Button>
