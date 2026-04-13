@@ -90,7 +90,7 @@ function AppContent() {
                   variant="outline"
                   size="sm"
                   disabled={page === 0}
-                  onClick={() => handlePageChange(page)}
+                  onClick={() => handlePageChange(page + 1 - 1)}
                 >
                   <ChevronLeft className="size-4" />
                   Previous
@@ -102,7 +102,7 @@ function AppContent() {
                   variant="outline"
                   size="sm"
                   disabled={page >= totalPages - 1}
-                  onClick={() => handlePageChange(page + 2)}
+                  onClick={() => handlePageChange(page + 1 + 1)}
                 >
                   Next
                   <ChevronRight className="size-4" />
