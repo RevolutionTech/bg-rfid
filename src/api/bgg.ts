@@ -32,7 +32,7 @@ export async function fetchThumbnails(
   if (ids.length === 0) return {};
 
   const response = await axios.get("/api/bgg/thing", {
-    params: { id: ids.join(","), type: "boardgame" },
+    params: { id: ids.join(","), type: "boardgame,boardgameexpansion" },
     headers: { Authorization: `Bearer ${token}` },
     responseType: "text",
   });
