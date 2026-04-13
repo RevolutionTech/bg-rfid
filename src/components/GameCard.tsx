@@ -43,7 +43,7 @@ export function GameRow({ game, thumbnail, thumbnailLoading }: GameRowProps) {
 
       {/* Name + RFID tag: stacked on mobile, side-by-side on sm+ */}
       <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-        <span className="text-sm font-semibold text-foreground sm:w-1/3 sm:shrink-0">
+        <span className="truncate text-sm font-semibold text-foreground sm:w-1/3 sm:shrink-0">
           {game.name}
         </span>
         <span className="min-w-0 truncate text-xs text-muted-foreground sm:flex-1 sm:text-sm">
