@@ -1,3 +1,8 @@
+output "role_arn" {
+  description = "The ARN of the IAM role for GitHub Actions (needed for OIDC authentication in CI/CD)"
+  value       = aws_iam_role.github_actions.arn
+}
+
 output "cloudfront_distribution_id" {
   description = "The ID of the CloudFront distribution (needed for cache invalidation in CI/CD)"
   value       = aws_cloudfront_distribution.cdn.id
