@@ -1,3 +1,10 @@
+resource "aws_acm_certificate" "static_website" {
+  domain_name       = var.domain_name
+  validation_method = "DNS"
+
+  tags = var.tags
+}
+
 resource "aws_cloudfront_origin_access_identity" "oai" {
   comment = "OAI for ${var.domain_name}"
 }
@@ -91,7 +98,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = var.acm_certificate_arn
+    acm_certificate_arn      = aws_acm_certificate.static_website.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2018"
   }
