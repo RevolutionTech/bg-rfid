@@ -42,7 +42,7 @@ function AppContent() {
     <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col items-center gap-8 px-4 py-8">
       <SettingsDialog token={token} onTokenChange={setToken} />
       <h1 className="text-3xl font-bold tracking-tight text-foreground">
-        BoardGameGeek Search
+        Board Game RFID Lookup
       </h1>
       <SearchBar onSearch={handleSearch} />
       {!token && (
