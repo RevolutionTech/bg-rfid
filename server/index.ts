@@ -16,7 +16,8 @@ app.all("/api/bgg/*", async (c) => {
     return c.text(body, response.status as ContentfulStatusCode, {
       "Content-Type": "text/xml",
     });
-  } catch {
+  } catch (e) {
+    console.error("Upstream fetch failed:", e instanceof Error ? e.message : "unknown error");
     return c.text("Bad Gateway", 502);
   }
 });
