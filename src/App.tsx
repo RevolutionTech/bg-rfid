@@ -39,64 +39,70 @@ function AppContent() {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col items-center gap-8 px-4 py-8">
+    <div className="flex min-h-screen flex-col">
       <SettingsDialog token={token} onTokenChange={setToken} />
-      <h1 className="text-3xl font-bold tracking-tight text-foreground">
-        Board Game RFID Lookup
-      </h1>
-      <SearchBar onSearch={handleSearch} />
-      {!token && (
-        <p className="text-sm text-muted-foreground">
-          Set your BGG app token in Settings (gear icon) to enable search.
-        </p>
-      )}
-      {isFetching && (
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Loader2 className="size-5 animate-spin" />
-          <span>Searching…</span>
+      <header className="bg-primary px-4 pb-8 pt-10 text-primary-foreground">
+        <div className="mx-auto max-w-5xl text-center">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Board Game RFID Lookup
+          </h1>
         </div>
-      )}
-      {isError && <ErrorState message="Failed to fetch results from BGG." />}
-      {!query && !isLoading && <EmptyState />}
-      {data && data.length > 0 && (
-        <>
-          <GameList
-            games={pageGames}
-            thumbnails={thumbnails}
-            thumbnailsLoading={thumbnailsLoading}
-          />
-          {totalPages > 1 && (
-            <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page === 0}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                <ChevronLeft className="size-4" />
-                Previous
-              </Button>
-              <span className="text-sm text-muted-foreground">
-                Page {page + 1} of {totalPages}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page >= totalPages - 1}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                Next
-                <ChevronRight className="size-4" />
-              </Button>
-            </div>
-          )}
-        </>
-      )}
-      {data && data.length === 0 && !isFetching && (
-        <p className="py-8 text-muted-foreground">
-          No results found. Try a different search term.
-        </p>
-      )}
+      </header>
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col items-center gap-6 px-4 py-6">
+        <SearchBar onSearch={handleSearch} />
+        {!token && (
+          <p className="text-sm text-muted-foreground">
+            Set your BGG app token in Settings (gear icon) to enable search.
+          </p>
+        )}
+        {isFetching && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Loader2 className="size-5 animate-spin" />
+            <span>Searching…</span>
+          </div>
+        )}
+        {isError && <ErrorState message="Failed to fetch results from BGG." />}
+        {!query && !isLoading && <EmptyState />}
+        {data && data.length > 0 && (
+          <>
+            <GameList
+              games={pageGames}
+              thumbnails={thumbnails}
+              thumbnailsLoading={thumbnailsLoading}
+            />
+            {totalPages > 1 && (
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page === 0}
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  <ChevronLeft className="size-4" />
+                  Previous
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  Page {page + 1} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= totalPages - 1}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  Next
+                  <ChevronRight className="size-4" />
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+        {data && data.length === 0 && !isFetching && (
+          <p className="py-8 text-muted-foreground">
+            No results found. Try a different search term.
+          </p>
+        )}
+      </main>
     </div>
   );
 }

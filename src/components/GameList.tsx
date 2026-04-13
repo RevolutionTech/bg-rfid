@@ -9,15 +9,13 @@ interface GameListProps {
 
 export function GameList({ games, thumbnails, thumbnailsLoading }: GameListProps) {
   return (
-    <table className="w-full border-collapse overflow-hidden rounded-lg border border-border text-left">
-      <thead>
-        <tr className="border-b border-border bg-muted text-xs font-medium text-muted-foreground">
-          <th className="px-4 py-2"><span className="sr-only">Thumbnail</span></th>
-          <th className="px-4 py-2">Name</th>
-          <th className="px-4 py-2">RFID Tag</th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-border">
+    <div className="w-full overflow-hidden rounded-lg border border-border">
+      <div className="hidden border-b border-border bg-muted px-4 py-2 text-xs font-medium text-muted-foreground sm:grid sm:grid-cols-[3rem_1fr_1fr]">
+        <span className="sr-only">Thumbnail</span>
+        <span>Name</span>
+        <span>RFID Tag</span>
+      </div>
+      <div className="divide-y divide-border">
         {games.map((game) => (
           <GameRow
             key={game.id}
@@ -26,7 +24,7 @@ export function GameList({ games, thumbnails, thumbnailsLoading }: GameListProps
             thumbnailLoading={thumbnailsLoading}
           />
         ))}
-      </tbody>
-    </table>
+      </div>
+    </div>
   );
 }

@@ -27,8 +27,9 @@ export function GameRow({ game, thumbnail, thumbnailLoading }: GameRowProps) {
   };
 
   return (
-    <tr className="bg-card">
-      <td className="px-4 py-3">
+    <div className="flex items-center gap-3 bg-card px-4 py-3">
+      {/* Thumbnail */}
+      <div className="shrink-0">
         {thumbnailLoading ? (
           <div className="h-10 w-10 animate-pulse rounded bg-muted" />
         ) : (
@@ -38,33 +39,37 @@ export function GameRow({ game, thumbnail, thumbnailLoading }: GameRowProps) {
             className="h-10 w-10 rounded object-contain"
           />
         )}
-      </td>
-      <td className="px-4 py-3 text-sm font-semibold text-foreground">
-        {game.name}
-      </td>
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">{rfidTag}</span>
-          <Button
-            variant="outline"
-            size="sm"
-            className="shrink-0"
-            onClick={handleCopy}
-          >
-            {copied ? (
-              <>
-                <Check data-icon="inline-start" className="size-3" />
-                Copied!
-              </>
-            ) : (
-              <>
-                <Copy data-icon="inline-start" className="size-3" />
-                Copy Tag
-              </>
-            )}
-          </Button>
-        </div>
-      </td>
-    </tr>
+      </div>
+
+      {/* Name + RFID tag: stacked on mobile, side-by-side on sm+ */}
+      <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
+        <span className="text-sm font-semibold text-foreground sm:w-1/3 sm:shrink-0">
+          {game.name}
+        </span>
+        <span className="min-w-0 truncate text-xs text-muted-foreground sm:flex-1 sm:text-sm">
+          {rfidTag}
+        </span>
+      </div>
+
+      {/* Copy button */}
+      <Button
+        variant="outline"
+        size="sm"
+        className="shrink-0"
+        onClick={handleCopy}
+      >
+        {copied ? (
+          <>
+            <Check data-icon="inline-start" className="size-3" />
+            <span className="hidden sm:inline">Copied!</span>
+          </>
+        ) : (
+          <>
+            <Copy data-icon="inline-start" className="size-3" />
+            <span className="hidden sm:inline">Copy Tag</span>
+          </>
+        )}
+      </Button>
+    </div>
   );
 }
