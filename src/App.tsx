@@ -18,7 +18,9 @@ const PAGE_SIZE = 20;
 function AppContent() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("q") ?? "";
-  const page = Math.max(0, (Number(searchParams.get("page")) || 1) - 1);
+  // pageIndex is 0-based for array slicing; currentPage is 1-based for the URL
+  const currentPage = Math.max(1, Number(searchParams.get("page")) || 1);
+  const pageIndex = currentPage - 1;
 
   const { token, setToken } = useAppToken();
   const { data, isLoading, isError, isFetching } = useBggSearch(query, token);
@@ -26,9 +28,9 @@ function AppContent() {
   const totalPages = data ? Math.ceil(data.length / PAGE_SIZE) : 0;
   const pageGames = useMemo(() => {
     if (!data) return [];
-    const start = page * PAGE_SIZE;
+    const start = pageIndex * PAGE_SIZE;
     return data.slice(start, start + PAGE_SIZE);
-  }, [data, page]);
+  }, [data, pageIndex]);
 
   const pageIds = useMemo(() => pageGames.map((g) => g.id), [pageGames]);
   const { thumbnails, isLoading: thumbnailsLoading } = useBggThumbnails(
@@ -89,20 +91,20 @@ function AppContent() {
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={page === 0}
-                  onClick={() => handlePageChange(page + 1 - 1)}
+                  disabled={currentPage <= 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
                 >
                   <ChevronLeft className="size-4" />
                   Previous
                 </Button>
                 <span className="text-sm text-muted-foreground">
-                  Page {page + 1} of {totalPages}
+                  Page {currentPage} of {totalPages}
                 </span>
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={page >= totalPages - 1}
-                  onClick={() => handlePageChange(page + 1 + 1)}
+                  disabled={currentPage >= totalPages}
+                  onClick={() => handlePageChange(currentPage + 1)}
                 >
                   Next
                   <ChevronRight className="size-4" />
