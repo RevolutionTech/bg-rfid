@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:server": "node --experimental-strip-types --no-warnings server/dev.ts",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:server": "esbuild server/index.ts --bundle --platform=node --target=node22 --outfile=dist/server/index.js"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
@@ -15,6 +17,7 @@
     "axios": "^1.15.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "hono": "^4.12.12",
     "lucide-react": "^1.8.0",
     "radix-ui": "^1.4.3",
     "react": "^19.2.4",
@@ -26,11 +29,14 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@hono/node-server": "^1.19.14",
     "@tailwindcss/vite": "^4.2.2",
+    "@types/aws-lambda": "^8.10.161",
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "esbuild": "^0.28.0",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
