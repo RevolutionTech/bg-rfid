@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MiddleTruncate } from "@/components/MiddleTruncate";
 import type { BggGame } from "@/types/bgg";
 
 const NO_IMAGE_PLACEHOLDER =
@@ -46,9 +47,10 @@ export function GameRow({ game, thumbnail, thumbnailLoading }: GameRowProps) {
         <span className="truncate text-sm font-semibold text-foreground sm:w-1/3 sm:shrink-0">
           {game.name}
         </span>
-        <span className="min-w-0 truncate text-xs text-muted-foreground sm:flex-1 sm:text-sm">
-          {rfidTag}
-        </span>
+        <MiddleTruncate
+          text={rfidTag}
+          className="min-w-0 text-xs text-muted-foreground sm:flex-1 sm:text-sm"
+        />
       </div>
 
       {/* Copy button */}
