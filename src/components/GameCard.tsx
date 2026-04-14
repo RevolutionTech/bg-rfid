@@ -28,16 +28,16 @@ export function GameRow({ game, thumbnail, thumbnailLoading }: GameRowProps) {
   };
 
   return (
-    <div className="flex items-center gap-3 bg-card px-4 py-3">
+    <div className="flex items-center gap-3 bg-card px-4 py-4">
       {/* Thumbnail */}
       <div className="shrink-0">
         {thumbnailLoading ? (
-          <div className="h-10 w-10 animate-pulse rounded bg-muted" />
+          <div className="h-24 w-24 animate-pulse rounded bg-muted sm:h-16 sm:w-16" />
         ) : (
           <img
             src={thumbnail ?? NO_IMAGE_PLACEHOLDER}
             alt={game.name}
-            className="h-10 w-10 rounded object-contain"
+            className="h-24 w-24 rounded object-contain sm:h-16 sm:w-16"
           />
         )}
       </div>
