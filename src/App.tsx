@@ -33,18 +33,18 @@ function AppContent() {
 
   // Clamp currentPage in the URL if it exceeds totalPages after filtering
   useEffect(() => {
-    if (totalPages > 0 && currentPage > totalPages) {
+    if (currentPage !== clampedPage) {
       setSearchParams((prev) => {
         const next = new URLSearchParams(prev);
-        if (totalPages <= 1) {
+        if (clampedPage <= 1) {
           next.delete("page");
         } else {
-          next.set("page", String(totalPages));
+          next.set("page", String(clampedPage));
         }
         return next;
       });
     }
-  }, [currentPage, totalPages, setSearchParams]);
+  }, [currentPage, clampedPage, setSearchParams]);
 
   const handleSearch = (q: string) => {
     setSearchParams(q ? { q } : {});
