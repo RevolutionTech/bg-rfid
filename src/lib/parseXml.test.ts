@@ -22,7 +22,7 @@ describe("parseSearchResults", () => {
     ]);
   });
 
-  it("filters out items where type='boardgameexpansion'", () => {
+  it("includes items regardless of type (no longer filters expansions)", () => {
     const xml = `<?xml version="1.0" encoding="utf-8"?>
     <items total="3">
       <item type="boardgame" id="13">
@@ -37,8 +37,8 @@ describe("parseSearchResults", () => {
     </items>`;
 
     const results = parseSearchResults(xml);
-    expect(results).toHaveLength(2);
-    expect(results.map((r) => r.id)).toEqual(["13", "42"]);
+    expect(results).toHaveLength(3);
+    expect(results.map((r) => r.id)).toEqual(["13", "99", "42"]);
   });
 
   it('returns an empty array for an <items total="0"> response', () => {
@@ -66,7 +66,7 @@ describe("parseSearchResults", () => {
 });
 
 describe("parseThingResults", () => {
-  it("returns a correct { [id]: thumbnailUrl } map from a valid thing XML response", () => {
+  it("returns a correct { [id]: ThingResult } map from a valid thing XML response", () => {
     const xml = `<?xml version="1.0" encoding="utf-8"?>
     <items>
       <item type="boardgame" id="13">
@@ -79,12 +79,18 @@ describe("parseThingResults", () => {
 
     const result = parseThingResults(xml);
     expect(result).toEqual({
-      "13": "https://cf.geekdo-images.com/catan_thumb.jpg",
-      "42": "https://cf.geekdo-images.com/seafarers_thumb.jpg",
+      "13": {
+        thumbnail: "https://cf.geekdo-images.com/catan_thumb.jpg",
+        type: "boardgame",
+      },
+      "42": {
+        thumbnail: "https://cf.geekdo-images.com/seafarers_thumb.jpg",
+        type: "boardgame",
+      },
     });
   });
 
-  it("handles a missing <thumbnail> element gracefully — omits that id from the map", () => {
+  it("handles a missing <thumbnail> element gracefully — includes the id with type but no thumbnail", () => {
     const xml = `<?xml version="1.0" encoding="utf-8"?>
     <items>
       <item type="boardgame" id="13">
@@ -97,8 +103,35 @@ describe("parseThingResults", () => {
 
     const result = parseThingResults(xml);
     expect(result).toEqual({
-      "13": "https://cf.geekdo-images.com/catan_thumb.jpg",
+      "13": {
+        thumbnail: "https://cf.geekdo-images.com/catan_thumb.jpg",
+        type: "boardgame",
+      },
+      "42": { type: "boardgame" },
     });
-    expect(result["42"]).toBeUndefined();
+  });
+
+  it("includes items of different types without filtering", () => {
+    const xml = `<?xml version="1.0" encoding="utf-8"?>
+    <items>
+      <item type="boardgame" id="13">
+        <thumbnail>https://cf.geekdo-images.com/catan_thumb.jpg</thumbnail>
+      </item>
+      <item type="boardgameexpansion" id="99">
+        <thumbnail>https://cf.geekdo-images.com/expansion_thumb.jpg</thumbnail>
+      </item>
+    </items>`;
+
+    const result = parseThingResults(xml);
+    expect(result).toEqual({
+      "13": {
+        thumbnail: "https://cf.geekdo-images.com/catan_thumb.jpg",
+        type: "boardgame",
+      },
+      "99": {
+        thumbnail: "https://cf.geekdo-images.com/expansion_thumb.jpg",
+        type: "boardgameexpansion",
+      },
+    });
   });
 });
