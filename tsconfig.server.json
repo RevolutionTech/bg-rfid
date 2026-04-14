@@ -19,5 +19,6 @@
     "ignoreDeprecations": "6.0",
     "paths": {}
   },
-  "include": ["server/**/*"]
+  "include": ["server/**/*"],
+  "exclude": ["server/**/*.test.*"]
 }
