@@ -7,6 +7,8 @@ export function parseSearchResults(xml: string): BggGame[] {
   const games: BggGame[] = [];
 
   items.forEach((item) => {
+    if (item.getAttribute("type") !== "boardgame") return;
+
     const id = item.getAttribute("id");
     const nameEl = item.querySelector('name[type="primary"]');
     const name = nameEl?.getAttribute("value");
