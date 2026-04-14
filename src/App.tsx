@@ -61,7 +61,7 @@ function AppContent() {
         <div className="mx-auto max-w-5xl text-center">
           <h1 className="flex items-center justify-center gap-3 text-2xl font-bold tracking-tight sm:text-3xl">
             <img
-              src="/favicon-32x32.png"
+              src="/logo.png"
               alt=""
               role="presentation"
               className="size-8"
