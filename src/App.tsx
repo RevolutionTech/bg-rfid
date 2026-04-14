@@ -63,6 +63,7 @@ function AppContent() {
             <img
               src="/favicon-32x32.png"
               alt=""
+              role="presentation"
               className="size-8"
             />
             Board Game RFID Lookup
