@@ -1,4 +1,4 @@
-import type { BggGame, ThingResult } from "@/types/bgg";
+import type { BggGame } from "@/types/bgg";
 
 export function parseSearchResults(xml: string): BggGame[] {
   const parser = new DOMParser();
@@ -7,6 +7,8 @@ export function parseSearchResults(xml: string): BggGame[] {
   const games: BggGame[] = [];
 
   items.forEach((item) => {
+    if (item.getAttribute("type") !== "boardgame") return;
+
     const id = item.getAttribute("id");
     const nameEl = item.querySelector('name[type="primary"]');
     const name = nameEl?.getAttribute("value");
@@ -19,25 +21,21 @@ export function parseSearchResults(xml: string): BggGame[] {
   return games;
 }
 
-export function parseThingResults(
-  xml: string,
-): Record<string, ThingResult> {
+export function parseThingResults(xml: string): Record<string, string> {
   const parser = new DOMParser();
   const doc = parser.parseFromString(xml, "text/xml");
   const items = doc.querySelectorAll("item");
-  const results: Record<string, ThingResult> = {};
+  const thumbnails: Record<string, string> = {};
 
   items.forEach((item) => {
     const id = item.getAttribute("id");
-    const type = item.getAttribute("type");
+    const thumbnailEl = item.querySelector("thumbnail");
+    const thumbnail = thumbnailEl?.textContent?.trim();
 
-    if (id && type) {
-      const thumbnailEl = item.querySelector("thumbnail");
-      const thumbnail = thumbnailEl?.textContent?.trim();
-
-      results[id] = thumbnail ? { thumbnail, type } : { type };
+    if (id && thumbnail) {
+      thumbnails[id] = thumbnail;
     }
   });
 
-  return results;
+  return thumbnails;
 }

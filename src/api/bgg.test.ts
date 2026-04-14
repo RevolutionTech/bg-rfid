@@ -9,7 +9,6 @@ describe("searchGames", () => {
     expect(results).toEqual([
       { id: "13", name: "Catan" },
       { id: "42", name: "Catan: Seafarers" },
-      { id: "99", name: "Catan: Cities & Knights" },
     ]);
   });
 
@@ -37,21 +36,11 @@ describe("searchGames", () => {
 });
 
 describe("fetchThumbnails", () => {
-  it("resolves with a correct Record<string, ThingResult> on a 200 response", async () => {
-    const result = await fetchThumbnails(["13", "42", "99"], "test-token");
+  it("resolves with a correct Record<string, string> on a 200 response", async () => {
+    const result = await fetchThumbnails(["13", "42"], "test-token");
     expect(result).toEqual({
-      "13": {
-        thumbnail: "https://cf.geekdo-images.com/catan_thumb.jpg",
-        type: "boardgame",
-      },
-      "42": {
-        thumbnail: "https://cf.geekdo-images.com/seafarers_thumb.jpg",
-        type: "boardgame",
-      },
-      "99": {
-        thumbnail: "https://cf.geekdo-images.com/cities_thumb.jpg",
-        type: "boardgameexpansion",
-      },
+      "13": "https://cf.geekdo-images.com/catan_thumb.jpg",
+      "42": "https://cf.geekdo-images.com/seafarers_thumb.jpg",
     });
   });
 

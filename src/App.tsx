@@ -33,18 +33,10 @@ function AppContent() {
   }, [data, pageIndex]);
 
   const pageIds = useMemo(() => pageGames.map((g) => g.id), [pageGames]);
-  const { thumbnails, thingResults, isLoading: thumbnailsLoading } = useBggThumbnails(
+  const { thumbnails, isLoading: thumbnailsLoading } = useBggThumbnails(
     pageIds,
     token,
   );
-
-  const filteredPageGames = useMemo(() => {
-    if (Object.keys(thingResults).length === 0) return pageGames;
-    return pageGames.filter((g) => {
-      const thing = thingResults[g.id];
-      return !thing || thing.type === "boardgame";
-    });
-  }, [pageGames, thingResults]);
 
   const handleSearch = (q: string) => {
     setSearchParams(q ? { q } : {});
@@ -90,7 +82,7 @@ function AppContent() {
         {data && data.length > 0 && (
           <>
             <GameList
-              games={filteredPageGames}
+              games={pageGames}
               thumbnails={thumbnails}
               thumbnailsLoading={thumbnailsLoading}
             />
