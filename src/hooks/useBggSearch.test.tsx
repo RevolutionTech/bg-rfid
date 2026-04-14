@@ -34,17 +34,20 @@ describe("useBggSearch", () => {
     expect(result.current.data).toBeUndefined();
   });
 
-  it("fetches search results when query is non-empty", async () => {
+  it("fetches and filters search results when query is non-empty", async () => {
     const { result } = renderHook(
       () => useBggSearch("catan", "test-token", 1),
       { wrapper: createWrapper() },
     );
 
-    await waitFor(() => expect(result.current.data).toBeDefined());
+    // isLoading should be true while both requests are in flight
+    expect(result.current.isLoading).toBe(true);
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    // data is now the filtered result (expansions removed)
     expect(result.current.data).toEqual([
       { id: "13", name: "Catan" },
       { id: "42", name: "Catan: Seafarers" },
-      { id: "99", name: "Catan: Cities & Knights" },
     ]);
   });
 
@@ -54,14 +57,11 @@ describe("useBggSearch", () => {
       { wrapper: createWrapper() },
     );
 
-    // Wait for thing data to load so filtering happens
-    await waitFor(() =>
-      expect(Object.keys(result.current.thingResults).length).toBeGreaterThan(0),
-    );
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     // The default handler has 3 search results: 2 boardgames + 1 expansion
     // After filtering, only 2 remain
-    expect(result.current.filteredData).toEqual([
+    expect(result.current.data).toEqual([
       { id: "13", name: "Catan" },
       { id: "42", name: "Catan: Seafarers" },
     ]);
@@ -95,9 +95,7 @@ describe("useBggSearch", () => {
       { wrapper: createWrapper() },
     );
 
-    await waitFor(() =>
-      expect(Object.keys(result.current.thingResults).length).toBeGreaterThan(0),
-    );
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.totalPages).toBe(Math.ceil(25 / PAGE_SIZE));
   });
 
@@ -124,51 +122,12 @@ describe("useBggSearch", () => {
       { wrapper: createWrapper() },
     );
 
-    await waitFor(() =>
-      expect(Object.keys(result.current.thingResults).length).toBeGreaterThan(0),
-    );
-    expect(result.current.filteredData).toEqual([]);
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual([]);
     expect(result.current.totalPages).toBe(1);
   });
 
-  it("clamps currentPage when it exceeds totalPages after filtering", async () => {
-    // 21 results, but 20 of them are expansions — only 1 boardgame remains (1 page)
-    const searchItems = Array.from(
-      { length: 21 },
-      (_, i) =>
-        `<item type="boardgame" id="${i + 1}"><name type="primary" value="Game ${i + 1}"/></item>`,
-    ).join("");
-    const searchXml = `<?xml version="1.0" encoding="utf-8"?><items total="21">${searchItems}</items>`;
-
-    const thingItems = [
-      `<item type="boardgame" id="1"><thumbnail>https://example.com/1.jpg</thumbnail></item>`,
-      ...Array.from(
-        { length: 20 },
-        (_, i) =>
-          `<item type="boardgameexpansion" id="${i + 2}"><thumbnail>https://example.com/${i + 2}.jpg</thumbnail></item>`,
-      ),
-    ].join("");
-    const thingXml = `<?xml version="1.0" encoding="utf-8"?><items>${thingItems}</items>`;
-
-    server.use(
-      http.get("/api/bgg/search", () => HttpResponse.xml(searchXml)),
-      http.get("/api/bgg/thing", () => HttpResponse.xml(thingXml)),
-    );
-
-    // User is on page 2, but only 1 page of filtered results exists
-    const { result } = renderHook(
-      () => useBggSearch("games", "test-token", 2),
-      { wrapper: createWrapper() },
-    );
-
-    await waitFor(() =>
-      expect(Object.keys(result.current.thingResults).length).toBeGreaterThan(0),
-    );
-    expect(result.current.totalPages).toBe(1);
-    expect(result.current.clampedPage).toBe(1);
-  });
-
-  it("shows unfiltered totalPages while thing data is loading", async () => {
+  it("keeps isLoading true until both search and thing requests resolve", async () => {
     // Delay the thing response
     const delayedThingXml = `<?xml version="1.0" encoding="utf-8"?>
       <items>
@@ -195,14 +154,16 @@ describe("useBggSearch", () => {
       { wrapper: createWrapper() },
     );
 
-    // Wait for search data but thing data is still loading
-    await waitFor(() => expect(result.current.data).toBeDefined());
-    // Before thing data arrives, totalPages is based on unfiltered data (3 items = 1 page)
-    expect(result.current.totalPages).toBe(1);
-    expect(result.current.isThingLoading).toBe(true);
+    // isLoading stays true while thing data is still loading
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.data).toBeUndefined();
 
-    // After thing data arrives, filtered (2 items = 1 page)
-    await waitFor(() => expect(result.current.isThingLoading).toBe(false));
+    // After both resolve, isLoading is false and data is available
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual([
+      { id: "13", name: "Catan" },
+      { id: "42", name: "Catan: Seafarers" },
+    ]);
     expect(result.current.totalPages).toBe(1);
   });
 });

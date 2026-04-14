@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
@@ -15,7 +14,6 @@ import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 function AppContent() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("q") ?? "";
-  // currentPage is 1-based for the URL
   const currentPage = Math.max(1, Number(searchParams.get("page")) || 1);
 
   const { token, setToken } = useAppToken();
@@ -24,27 +22,9 @@ function AppContent() {
     pageGames,
     thumbnails,
     totalPages,
-    clampedPage,
     isLoading,
     isError,
-    isFetching,
-    isThingLoading,
   } = useBggSearch(query, token, currentPage);
-
-  // Clamp currentPage in the URL if it exceeds totalPages after filtering
-  useEffect(() => {
-    if (currentPage !== clampedPage) {
-      setSearchParams((prev) => {
-        const next = new URLSearchParams(prev);
-        if (clampedPage <= 1) {
-          next.delete("page");
-        } else {
-          next.set("page", String(clampedPage));
-        }
-        return next;
-      });
-    }
-  }, [currentPage, clampedPage, setSearchParams]);
 
   const handleSearch = (q: string) => {
     setSearchParams(q ? { q } : {});
@@ -79,7 +59,7 @@ function AppContent() {
             Set your BGG app token in Settings (gear icon) to enable search.
           </p>
         )}
-        {isFetching && (
+        {isLoading && (
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="size-5 animate-spin" />
             <span>Searching…</span>
@@ -87,32 +67,31 @@ function AppContent() {
         )}
         {isError && <ErrorState message="Failed to fetch results from BGG." />}
         {!query && !isLoading && <EmptyState />}
-        {data && data.length > 0 && (
+        {!isLoading && data && data.length > 0 && (
           <>
             <GameList
               games={pageGames}
               thumbnails={thumbnails}
-              thumbnailsLoading={isThingLoading}
             />
             {totalPages > 1 && (
               <div className="flex items-center gap-4">
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={clampedPage <= 1}
-                  onClick={() => handlePageChange(clampedPage - 1)}
+                  disabled={currentPage <= 1}
+                  onClick={() => handlePageChange(currentPage - 1)}
                 >
                   <ChevronLeft className="size-4" />
                   Previous
                 </Button>
                 <span className="text-sm text-muted-foreground">
-                  Page {clampedPage} of {totalPages}
+                  Page {currentPage} of {totalPages}
                 </span>
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={clampedPage >= totalPages}
-                  onClick={() => handlePageChange(clampedPage + 1)}
+                  disabled={currentPage >= totalPages}
+                  onClick={() => handlePageChange(currentPage + 1)}
                 >
                   Next
                   <ChevronRight className="size-4" />
@@ -121,7 +100,7 @@ function AppContent() {
             )}
           </>
         )}
-        {data && data.length === 0 && !isFetching && (
+        {!isLoading && data && data.length === 0 && (
           <p className="py-8 text-muted-foreground">
             No results found. Try a different search term.
           </p>
