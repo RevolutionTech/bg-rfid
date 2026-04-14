@@ -26,10 +26,6 @@ const thingXml = `<?xml version="1.0" encoding="utf-8"?>
     <thumbnail>https://cf.geekdo-images.com/seafarers_thumb.jpg</thumbnail>
     <name type="primary" sortindex="1" value="Catan: Seafarers"/>
   </item>
-  <item type="boardgameexpansion" id="99">
-    <thumbnail>https://cf.geekdo-images.com/cities_thumb.jpg</thumbnail>
-    <name type="primary" sortindex="1" value="Catan: Cities &amp; Knights"/>
-  </item>
 </items>`;
 
 export const handlers = [
