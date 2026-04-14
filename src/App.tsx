@@ -1,10 +1,9 @@
-import { useMemo } from "react";
+import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useAppToken } from "@/hooks/useAppToken";
 import { useBggSearch } from "@/hooks/useBggSearch";
-import { useBggThumbnails } from "@/hooks/useBggThumbnails";
 import { SearchBar } from "@/components/SearchBar";
 import { GameList } from "@/components/GameList";
 import { EmptyState } from "@/components/EmptyState";
@@ -13,38 +12,39 @@ import { SettingsDialog } from "@/components/SettingsDialog";
 import { Button } from "@/components/ui/button";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 
-const PAGE_SIZE = 20;
-
 function AppContent() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("q") ?? "";
-  // pageIndex is 0-based for array slicing; currentPage is 1-based for the URL
+  // currentPage is 1-based for the URL
   const currentPage = Math.max(1, Number(searchParams.get("page")) || 1);
-  const pageIndex = currentPage - 1;
 
   const { token, setToken } = useAppToken();
-  const { data, isLoading, isError, isFetching } = useBggSearch(query, token);
+  const {
+    data,
+    pageGames,
+    thumbnails,
+    totalPages,
+    clampedPage,
+    isLoading,
+    isError,
+    isFetching,
+    isThingLoading,
+  } = useBggSearch(query, token, currentPage);
 
-  const totalPages = data ? Math.ceil(data.length / PAGE_SIZE) : 0;
-  const pageGames = useMemo(() => {
-    if (!data) return [];
-    const start = pageIndex * PAGE_SIZE;
-    return data.slice(start, start + PAGE_SIZE);
-  }, [data, pageIndex]);
-
-  const pageIds = useMemo(() => pageGames.map((g) => g.id), [pageGames]);
-  const { thumbnails, thingResults, isLoading: thumbnailsLoading } = useBggThumbnails(
-    pageIds,
-    token,
-  );
-
-  const filteredPageGames = useMemo(() => {
-    if (Object.keys(thingResults).length === 0) return pageGames;
-    return pageGames.filter((g) => {
-      const thing = thingResults[g.id];
-      return !thing || thing.type === "boardgame";
-    });
-  }, [pageGames, thingResults]);
+  // Clamp currentPage in the URL if it exceeds totalPages after filtering
+  useEffect(() => {
+    if (totalPages > 0 && currentPage > totalPages) {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        if (totalPages <= 1) {
+          next.delete("page");
+        } else {
+          next.set("page", String(totalPages));
+        }
+        return next;
+      });
+    }
+  }, [currentPage, totalPages, setSearchParams]);
 
   const handleSearch = (q: string) => {
     setSearchParams(q ? { q } : {});
@@ -90,29 +90,29 @@ function AppContent() {
         {data && data.length > 0 && (
           <>
             <GameList
-              games={filteredPageGames}
+              games={pageGames}
               thumbnails={thumbnails}
-              thumbnailsLoading={thumbnailsLoading}
+              thumbnailsLoading={isThingLoading}
             />
             {totalPages > 1 && (
               <div className="flex items-center gap-4">
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={currentPage <= 1}
-                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={clampedPage <= 1}
+                  onClick={() => handlePageChange(clampedPage - 1)}
                 >
                   <ChevronLeft className="size-4" />
                   Previous
                 </Button>
                 <span className="text-sm text-muted-foreground">
-                  Page {currentPage} of {totalPages}
+                  Page {clampedPage} of {totalPages}
                 </span>
                 <Button
                   variant="outline"
                   size="sm"
-                  disabled={currentPage >= totalPages}
-                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={clampedPage >= totalPages}
+                  onClick={() => handlePageChange(clampedPage + 1)}
                 >
                   Next
                   <ChevronRight className="size-4" />
