@@ -59,7 +59,13 @@ function AppContent() {
       <SettingsDialog token={token} onTokenChange={setToken} />
       <header className="bg-primary px-4 pb-8 pt-10 text-primary-foreground">
         <div className="mx-auto max-w-5xl text-center">
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          <h1 className="flex items-center justify-center gap-3 text-2xl font-bold tracking-tight sm:text-3xl">
+            <img
+              src="/logo.png"
+              alt=""
+              role="presentation"
+              className="size-8"
+            />
             Board Game RFID Lookup
           </h1>
         </div>
