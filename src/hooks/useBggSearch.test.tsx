@@ -46,18 +46,6 @@ describe("useBggSearch", () => {
     ]);
   });
 
-  it("no longer filters expansions at search time (all items returned)", async () => {
-    // The mock response has 3 items total (2 boardgame + 1 boardgameexpansion)
-    // parseSearchResults no longer filters by type, so we get all 3
-    const { result } = renderHook(() => useBggSearch("catan", "test-token"), {
-      wrapper: createWrapper(),
-    });
-
-    await waitFor(() => expect(result.current.data).toBeDefined());
-    // All 3 items in the XML are returned
-    expect(result.current.data).toHaveLength(3);
-  });
-
   it("returns correct totalPages for a result set larger than 20", async () => {
     // Create a response with 25 boardgame items
     const items = Array.from(

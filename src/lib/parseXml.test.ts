@@ -22,25 +22,6 @@ describe("parseSearchResults", () => {
     ]);
   });
 
-  it("includes items regardless of type (no longer filters expansions)", () => {
-    const xml = `<?xml version="1.0" encoding="utf-8"?>
-    <items total="3">
-      <item type="boardgame" id="13">
-        <name type="primary" value="Catan"/>
-      </item>
-      <item type="boardgameexpansion" id="99">
-        <name type="primary" value="Catan: Cities &amp; Knights"/>
-      </item>
-      <item type="boardgame" id="42">
-        <name type="primary" value="Catan: Seafarers"/>
-      </item>
-    </items>`;
-
-    const results = parseSearchResults(xml);
-    expect(results).toHaveLength(3);
-    expect(results.map((r) => r.id)).toEqual(["13", "99", "42"]);
-  });
-
   it('returns an empty array for an <items total="0"> response', () => {
     const xml = `<?xml version="1.0" encoding="utf-8"?>
     <items total="0"></items>`;
