@@ -6,16 +6,15 @@ import type { BggGame, ThingResult } from "@/types/bgg";
 export const PAGE_SIZE = 20;
 
 export function useBggSearch(query: string, token: string, currentPage: number) {
-  const enabled = query.length > 0 && token.length > 0;
-
   const {
     data: searchData,
-    isLoading: isSearchLoading,
+    isLoading,
     isError,
+    isFetching,
   } = useQuery({
     queryKey: ["bggSearch", query, token],
     queryFn: () => searchGames(query, token),
-    enabled,
+    enabled: query.length > 0 && token.length > 0,
   });
 
   const allIds = useMemo(
@@ -29,17 +28,14 @@ export function useBggSearch(query: string, token: string, currentPage: number) 
     enabled: allIds.length > 0 && token.length > 0,
   });
 
-  // Combined loading: true until both requests have resolved
-  const isLoading = enabled && (isSearchLoading || isThingLoading);
-
   const thingResults: Record<string, ThingResult> = useMemo(
     () => thingData ?? {},
     [thingData],
   );
 
-  // Only compute filtered data once both responses are available
   const filteredData: BggGame[] | undefined = useMemo(() => {
-    if (!searchData || !thingData) return undefined;
+    if (!searchData) return undefined;
+    if (!thingData) return searchData;
     return searchData.filter((g) => {
       const thing = thingData[g.id];
       return !thing || thing.type === "boardgame";
@@ -51,12 +47,14 @@ export function useBggSearch(query: string, token: string, currentPage: number) 
     return Math.max(1, Math.ceil(filteredData.length / PAGE_SIZE));
   }, [filteredData]);
 
+  const clampedPage = Math.min(currentPage, Math.max(1, totalPages));
+
   const pageGames: BggGame[] = useMemo(() => {
     if (!filteredData) return [];
-    const pageIndex = Math.min(currentPage, Math.max(1, totalPages)) - 1;
+    const pageIndex = clampedPage - 1;
     const start = pageIndex * PAGE_SIZE;
     return filteredData.slice(start, start + PAGE_SIZE);
-  }, [filteredData, currentPage, totalPages]);
+  }, [filteredData, clampedPage]);
 
   const thumbnails: Record<string, string> = useMemo(() => {
     const result: Record<string, string> = {};
@@ -69,11 +67,16 @@ export function useBggSearch(query: string, token: string, currentPage: number) 
   }, [thingResults]);
 
   return {
-    data: filteredData,
+    data: searchData,
+    filteredData,
     pageGames,
     thumbnails,
+    thingResults,
     totalPages,
+    clampedPage,
     isLoading,
     isError,
+    isFetching,
+    isThingLoading,
   };
 }
